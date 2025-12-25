@@ -1,1 +1,226 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Ronnie Ruchal Payroll v1.8</title>
+<style>
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#eef4fb;}
+.container{max-width:420px;margin:auto;padding:14px;}
+h2{text-align:center;color:#1e88e5;margin-bottom:5px;font-size: 22px; font-weight: bold;}
+.card{background:#fff;padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,.08);}
+label{font-size:12px;color:#1e88e5;font-weight:bold;display: block; margin-bottom: 2px;}
+select,button,input{width:100%;padding:12px;font-size:16px;border-radius:8px;border:1px solid #cfd8dc;margin-bottom:12px; box-sizing: border-box;}
+button{background:#2962ff;color:#fff;border:none;cursor:pointer;font-weight:bold;}
+button:active{transform: scale(0.98);}
+table{width:100%;border-collapse:collapse;font-size:12px; margin-bottom: 10px;}
+th{color: #90a4ae; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+td{padding:10px 2px; border-bottom: 1px solid #f1f1f1; text-align: center;}
+.red-text{color: #ff5252; font-weight: bold;}
+.report-card{background:#0a192f; color:#fff; padding:18px; border-radius:12px;}
+.report-title{font-size: 16px; font-weight: bold; margin-bottom: 12px; border-bottom: 1px solid #1e2d4d; padding-bottom: 5px; color: #4caf50;}
+.report-line{display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: #e0e0e0; border-bottom: 0.5px solid #1e2d4d; padding-bottom: 4px;}
+.report-val{font-weight: bold; color: #fff; font-family: monospace;}
+.salary-box{background: #1e2d4d; padding: 12px; border-radius: 8px; margin-top: 10px; text-align: center; border: 1px solid #2962ff;}
+.total-amt{font-size: 26px; color: #4caf50; font-weight: bold; margin: 10px 0;}
+.red-btn{background: #d32f2f; margin-top: 10px; padding: 8px;}
+.hide{display: none;}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>Ronnie Ruchal</h2>
+<p style="text-align:center; margin-top:-8px; font-size:11px; color:#666;">OT & Payroll System • v1.8.0</p>
+
+<div class="card">
+  <label>Day Type (दिनको प्रकार)</label>
+  <select id="dayType" onchange="updateUI()">
+    <option value="weekday">Weekday (Mon-Fri)</option>
+    <option value="saturday">Saturday</option>
+    <option value="sunday">Sunday</option>
+    <option value="holiday">Public Holiday</option>
+  </select>
+
+  <label>Date (मिति)</label>
+  <select id="dateOffset">
+    <option value="0">Today (आज)</option>
+    <option value="1">1 day ago</option>
+    <option value="2">2 days ago</option>
+  </select>
+
+  <div id="workedBox" class="hide">
+    <label>Worked Today? (काम गरेको हो?)</label>
+    <select id="worked" onchange="updateUI()">
+      <option value="yes">Yes (काम गरेको)</option>
+      <option value="no">No (बिदा बसेको)</option>
+    </select>
+  </div>
+
+  <div id="outBox">
+    <label>Out Time (काम सकिएको समय)</label>
+    <select id="outTime"></select>
+  </div>
+
+  <button onclick="saveEntry()">Save Day (सेभ गर्नुहोस्)</button>
+</div>
+
+<div class="card" style="padding: 10px;">
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Day</th><th>Basic</th><th>OT</th><th>Del</th></tr>
+    </thead>
+    <tbody id="historyBody"></tbody>
+  </table>
+
+  <div class="report-card">
+    <div class="report-title">Monthly Summary</div>
+    <div class="report-line"><span>Weekday Basic:</span><span class="report-val" id="totalBasicHrs">0</span></div>
+    
+    <div class="report-line"><span>Saturday:</span><span class="report-val" id="satStats">0 days (0 hrs)</span></div>
+    <div class="report-line"><span>Sunday:</span><span class="report-val" id="sunStats">0 days (0 hrs)</span></div>
+    <div class="report-line"><span>Holiday:</span><span class="report-val" id="holStats">0 days (0 hrs)</span></div>
+    
+    <div class="report-line"><span>Total OT (1.5x):</span><span class="report-val" id="totalNormalOt">0.00</span></div>
+    <div class="report-line"><span>Night OT (3.0x):</span><span class="report-val" id="totalNightOt">0.00</span></div>
+    
+    <div class="salary-box">
+      <label style="color:#90a4ae">Hourly Rate (₩)</label>
+      <input type="number" id="hourlyRate" value="9860" style="margin-bottom: 8px; text-align: center; color: #2962ff; font-weight: bold;">
+      <button onclick="calculateSalary()">Calculate Total Salary</button>
+      <div class="total-amt">₩ <span id="finalSalary">0</span></div>
+      <button class="red-btn" onclick="resetAll()">Reset This Month</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const STORE_KEY="ronnie_payroll_v1.8";
+let entries=JSON.parse(localStorage.getItem(STORE_KEY)||"[]");
+
+const weekdayTimes=["5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM","10:00 PM","10:30 PM","11:00 PM","11:30 PM","12:00 AM"];
+const weekendTimes=["5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM"];
+
+function timeToMins(t) {
+    let [time, mod] = t.split(' ');
+    let [h, m] = time.split(':');
+    h = parseInt(h);
+    if (h === 12) h = (mod === 'AM') ? 0 : 12;
+    else if (mod === 'PM') h += 12;
+    let mins = (h * 60) + parseInt(m);
+    return (mins === 0) ? 1440 : mins;
+}
+
+function updateUI(){
+  let day=document.getElementById("dayType").value;
+  let worked=document.getElementById("worked").value;
+  let out=document.getElementById("outTime");
+  out.innerHTML="";
+  
+  let currentTimes = (day === "weekday") ? weekdayTimes : weekendTimes;
+  currentTimes.forEach(t=>{ let o=document.createElement("option"); o.value=t; o.text=t; out.appendChild(o); });
+
+  if(day==="weekday") {
+      document.getElementById("workedBox").classList.add("hide");
+      document.getElementById("outBox").classList.remove("hide");
+  } else {
+    document.getElementById("workedBox").classList.remove("hide");
+    if(worked==="no") document.getElementById("outBox").classList.add("hide");
+    else document.getElementById("outBox").classList.remove("hide");
+  }
+}
+
+function saveEntry(){
+  let day=document.getElementById("dayType").value;
+  let off=parseInt(document.getElementById("dateOffset").value);
+  let d=new Date(); d.setDate(d.getDate()-off);
+  let date=d.toISOString().slice(0,10);
+
+  if(entries.find(e=>e.date===date)) return alert("Data exists!");
+
+  let outVal = document.getElementById("outTime").value;
+  let workedVal = (day==="weekday") ? "yes" : document.getElementById("worked").value;
+  
+  let normalOt = 0, nightOt = 0, basicHrs = 0;
+
+  if(day === "weekday") {
+    basicHrs = 8;
+    if(workedVal === "yes") {
+      let outMins = timeToMins(outVal);
+      normalOt = Math.max(0, (Math.min(outMins, 1320) - 1050) / 60);
+      nightOt = Math.max(0, (outMins - 1320) / 60);
+    }
+  } else {
+    if(day === "sunday") basicHrs = 8;
+    if(workedVal === "yes") {
+      let outMins = timeToMins(outVal);
+      let extraOtAfterFiveThirty = Math.max(0, (Math.min(outMins, 1320) - 1050) / 60);
+      normalOt = 8 + extraOtAfterFiveThirty; 
+      nightOt = Math.max(0, (outMins - 1320) / 60);
+    }
+  }
+
+  entries.push({ date, day, worked:workedVal, normalOt, nightOt, basicHrs });
+  entries.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  localStorage.setItem(STORE_KEY, JSON.stringify(entries));
+  renderHistory();
+}
+
+function calculateSalary() {
+  let rate = parseFloat(document.getElementById("hourlyRate").value) || 0;
+  let totalPay = 0;
+
+  entries.forEach(e => {
+    let dayPay = (e.basicHrs * rate); 
+    if (e.worked === "yes") {
+      dayPay += (e.normalOt * rate * 1.5) + (e.nightOt * rate * 3.0);
+    }
+    totalPay += dayPay;
+  });
+  document.getElementById("finalSalary").innerText = Math.round(totalPay).toLocaleString();
+}
+
+function renderHistory(){
+  let body=document.getElementById("historyBody");
+  body.innerHTML="";
+  let wBasic=0, nOT=0, niOT=0;
+  let satD=0, satH=0, sunD=0, sunH=0, holD=0, holH=0;
+
+  entries.forEach((e,i)=>{
+    if(e.day==="weekday") wBasic += e.basicHrs;
+    
+    if(e.worked==="yes"){
+        if(e.day==="saturday") { satD++; satH += (e.normalOt + e.nightOt); }
+        else if(e.day==="sunday") { sunD++; sunH += (e.normalOt + e.nightOt); }
+        else if(e.day==="holiday") { holD++; holH += (e.normalOt + e.nightOt); }
+    }
+
+    nOT += e.normalOt;
+    niOT += e.nightOt;
+
+    let tr=document.createElement("tr");
+    tr.innerHTML=`<td>${e.date.slice(5)}</td>
+                  <td class="${e.day!=='weekday'?'red-text':''}">${e.day}</td>
+                  <td>${e.basicHrs}</td>
+                  <td class="${(e.normalOt+e.nightOt)>0?'red-text':''}">${(e.normalOt+e.nightOt).toFixed(1)}</td>
+                  <td><button style="background:none; color:red; border:none; font-weight:bold;" onclick="delEntry(${i})">X</button></td>`;
+    body.appendChild(tr);
+  });
+  
+  document.getElementById("totalBasicHrs").innerText = wBasic + " hrs";
+  document.getElementById("satStats").innerText = satD + " days (" + satH.toFixed(1) + " hrs)";
+  document.getElementById("sunStats").innerText = sunD + " days (" + sunH.toFixed(1) + " hrs)";
+  document.getElementById("holStats").innerText = holD + " days (" + holH.toFixed(1) + " hrs)";
+  document.getElementById("totalNormalOt").innerText = nOT.toFixed(2);
+  document.getElementById("totalNightOt").innerText = niOT.toFixed(2);
+}
+
+function delEntry(i){ if(confirm("Delete?")){ entries.splice(i,1); localStorage.setItem(STORE_KEY, JSON.stringify(entries)); renderHistory(); } }
+function resetAll(){ if(confirm("Reset?")){ entries=[]; localStorage.setItem(STORE_KEY,"[]"); renderHistory(); } }
+
+updateUI(); renderHistory();
+</script>
+</body>
+</html>
 
