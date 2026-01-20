@@ -1,315 +1,358 @@
 <!DOCTYPE html>
 <html lang="ne">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Poison & Save: Dammi Edition</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        :root { --primary: #780000; --bg: #fdf0d5; --accent: #003049; --gold: #fcbf49; --red-flash: #ff4d4d; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; touch-action: manipulation; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        
-        #game-container { width: 95%; max-width: 400px; height: 92vh; background: white; padding: 15px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; overflow: hidden; }
-        
-        /* UI Elements */
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; text-align: center; font-size: 16px; transition: 0.3s; }
-        input:focus { border-color: var(--accent); outline: none; }
-        .btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        .room-card { background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary); animation: slideIn 0.3s ease-out; }
-        
-        /* Game Board & Glow */
-        .scoreboard { display: grid; gap: 8px; background: var(--accent); color: white; padding: 10px; border-radius: 15px; margin-bottom: 10px; }
-        .player-slot { padding: 8px; border-radius: 10px; border: 2px solid transparent; text-align: center; background: rgba(255,255,255,0.1); transition: 0.3s; }
-        
-        @keyframes neonGlow {
-            0% { box-shadow: 0 0 5px var(--gold); border-color: var(--gold); transform: scale(1); }
-            50% { box-shadow: 0 0 15px var(--gold); border-color: white; transform: scale(1.02); }
-            100% { box-shadow: 0 0 5px var(--gold); border-color: var(--gold); transform: scale(1); }
-        }
-        .active-turn { animation: neonGlow 1.5s infinite ease-in-out; background: rgba(252, 191, 73, 0.2); z-index: 10; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Ronnie Payroll Pro v4.9 (With Reminder)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root { --primary: #2962ff; --bg: #f0f4f8; --card-bg: #ffffff; --text: #333; --red-highlight: #d32f2f; --green: #4caf50; }
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);}
+.container{max-width:420px;margin:auto;padding:12px;}
+h2{text-align:center;color:var(--primary);margin-bottom:15px;}
+.card{background:var(--card-bg);padding:16px;border-radius:16px;margin-bottom:12px;box-shadow:0 8px 20px rgba(0,0,0,.05); position: relative;}
+label{font-size:11px;color:var(--primary);font-weight:bold;display:block;margin-bottom:4px;text-transform:uppercase;}
+select, input[type="date"], input[type="number"], input[type="time"] {
+    width: 100%; height: 48px; padding: 0 12px; font-size: 16px; border-radius: 12px; 
+    border: 1.5px solid #d1d9e6; margin-bottom: 12px; box-sizing: border-box; 
+    background-color: #fcfcfc; outline: none; color: #333; display: block; -webkit-appearance: none;
+}
+.btn-save {width: 100%; height: 50px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{color:#90a4ae; padding-bottom:8px; text-align: center;}
+td{padding:10px 2px; border-bottom:1px solid #f9f9f9; text-align:center;}
+.date-big { font-size: 18px; font-weight: 900; color: #000; display: block; }
+.month-small { font-size: 10px; color: #666; font-weight: normal; text-transform: uppercase; }
+.holiday-row { background-color: var(--red-highlight) !important; color: white !important; }
+.report-card { background: #0a192f; color: #fff; padding: 20px; border-radius: 16px; margin-top: 10px; }
+.report-title{font-size:18px;font-weight:bold;margin-bottom:12px;color: var(--green); border-bottom: 1px solid #1e2d4d; padding-bottom: 8px;}
+.report-line{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;}
+.report-val{font-weight:bold; color: #fff;}
+.salary-box{background:#112240;padding:15px;border-radius:12px;margin-top:10px;text-align:center;}
+.total-amt{font-size:28px;color:var(--green);font-weight:bold;margin:5px 0;}
+.calc-btn {width: 100%; height: 48px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin: 10px 0; cursor: pointer;}
+.back-btn {width: 100%; height: 48px; background: #546e7a; color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 10px; cursor: pointer;}
+.photo-btn {width: 100%; height: 48px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;}
+.red-btn{background:#d32f2f; width: 100%; height: 35px; color: #fff; border: none; border-radius: 8px; margin-top: 10px; cursor: pointer;}
+.show-more-btn { background: #eceff1; color: #546e7a; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 8px; margin-top: 10px; cursor: pointer; }
+.reminder-btn { width: 100%; height: 40px; background: #ff9800; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px;}
+.hide{display:none;}
+.exporting .del-col, .exporting .show-more-btn, .exporting .back-btn, .exporting .reminder-card { display: none !important; }
 
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex-grow: 1; align-content: center; }
-        .candy { aspect-ratio: 1/1; font-size: 40px; background: #fff; border: 2px solid #f0f0f0; border-radius: 15px; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 4px 0 #ddd; cursor: pointer; }
-        .candy:active { transform: translateY(4px); box-shadow: none; }
-        
-        .red-hit { background: var(--red-flash) !important; border-color: white !important; animation: shake 0.3s; box-shadow: none; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .removed { opacity: 0; pointer-events: none; transform: scale(0.5); transition: 0.3s; }
-        .hidden { display: none !important; }
-        .overlay { position: absolute; top:0; left:0; width:100%; height:100%; background:white; z-index: 2000; padding: 25px; text-align:center; border-radius: 25px; display: flex; flex-direction: column; justify-content: center; }
-        .game-overlay { background: rgba(0,0,0,0.92); color: white; backdrop-filter: blur(5px); }
-    </style>
+#toast {
+    visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
+    text-align: center; border-radius: 12px; padding: 16px; position: fixed;
+    z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%);
+    font-size: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+#toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+</style>
 </head>
 <body>
+<div class="container">
+    <h2>Ronnie Ruchal</h2>
+    <div id="toast">डाटा सेभ भयो! ✅</div>
 
-<div id="game-container">
-    <div id="hub-screen">
-        <h2 style="text-align:center; color:var(--primary); letter-spacing: 1px;">🍫 POISON & SAVE</h2>
-        <input type="text" id="playerName" placeholder="Tapaiko Naam">
-        <button class="btn" style="background:var(--accent); margin-bottom: 10px;" onclick="showCreateModal()">+ CREATE NEW ROOM</button>
-        <div style="height: 320px; overflow-y: auto; padding: 5px;">
-            <p style="font-weight:bold; font-size:13px; color:#888; text-transform: uppercase;">Active Rooms</p>
-            <div id="active-rooms-list">Scanning...</div>
+    <div class="card">
+        <label>Select Date</label>
+        <input type="date" id="inputDate" onchange="autoDetectDay()">
+        <label>Day Type</label>
+        <select id="dayType" onchange="updateUI()">
+            <option value="weekday">Weekday (Mon-Fri)</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+            <option value="holiday">Public Holiday</option>
+        </select>
+        <div id="workedBox" class="hide">
+            <label>Worked Today?</label>
+            <select id="worked" onchange="updateUI()">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div id="outBox"><label>Out Time</label><select id="outTime"></select></div>
+        <button class="btn-save" onclick="saveEntry()">Save Entry 💾</button>
+    </div>
+
+    <div class="card reminder-card">
+        <label>⏰ Daily Reminder (नोटिफिकेसन)</label>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="time" id="reminderTime" style="margin-bottom:0;">
+            <button class="reminder-btn" style="width: 80px; margin:0;" onclick="setReminder()">ON ✅</button>
+        </div>
+        <div id="reminderStatus" style="font-size:12px; color:#666; margin-top:8px; text-align:center;">
+            Not set
         </div>
     </div>
 
-    <div id="create-modal" class="overlay hidden">
-        <h2 style="color:var(--primary)">Room Setup</h2>
-        <input type="text" id="newRoomId" placeholder="Room Name (e.g. Fun123)">
-        <input type="password" id="newRoomPass" placeholder="Set Room PIN">
-        <button class="btn" onclick="createNewRoom()">CREATE ROOM</button>
-        <p onclick="closeModals()" style="color:gray; cursor:pointer; margin-top:15px; font-size: 14px;">← Go Back</p>
+    <div id="exportArea">
+        <div class="card" style="margin-bottom:0; border-radius: 16px 16px 0 0;">
+            <label style="margin-bottom:10px;">History (OT Records)</label>
+            <table>
+                <thead><tr><th>Date</th><th>Day</th><th>Basic</th><th>OT</th><th class="del-col">Del</th></tr></thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+            <button id="showMoreBtn" class="show-more-btn" onclick="toggleHistory()">Show More 🔽</button>
+        </div>
+
+        <div id="hourView" class="report-card" style="margin-top:0; border-radius: 0 0 16px 16px;">
+            <div class="report-title">Monthly Summary</div>
+            <div class="report-line"><span>📅 Weekday Basic:</span><span class="report-val" id="hWBasic">0 hrs</span></div>
+            <div class="report-line"><span>🗓️ Saturday Days:</span><span class="report-val" id="hSat">0 d</span></div>
+            <div class="report-line"><span>☀️ Sunday Days:</span><span class="report-val" id="hSun">0 d</span></div>
+            <div class="report-line"><span>🎈 Holiday Days:</span><span class="report-val" id="hHol">0 d</span></div>
+            <div class="report-line"><span>⚙️ Normal OT (Hrs):</span><span class="report-val" id="hNormalOT">0.0</span></div>
+            <div class="report-line"><span>🌙 Night OT (Hrs):</span><span class="report-val" id="hNightOT">0.0</span></div>
+            <div class="salary-box"><div class="total-amt">₩ 0</div></div>
+        </div>
+
+        <div id="moneyView" class="report-card hide" style="margin-top:0; border-radius: 0 0 16px 16px;">
+            <div class="report-title">Salary Breakdown</div>
+            <div class="report-line"><span>📅 Basic (Mon-Fri):</span><span class="report-val" id="mWBasic">₩ 0</span></div>
+            <div class="report-line"><span>☀️ Sunday Basic:</span><span class="report-val" id="mSunBasic">₩ 0</span></div>
+            <div class="report-line"><span>🎈 Holiday Basic:</span><span class="report-val" id="mHolBasic">₩ 0</span></div>
+            <div class="report-line"><span>⚙️ Weekday OT (1.5x):</span><span class="report-val" id="mWOT">₩ 0</span></div>
+            <div class="report-line"><span>🗓️ Saturday OT (1.5x):</span><span class="report-val" id="mSatOT">₩ 0</span></div>
+            <div class="report-line"><span>☀️ Sunday OT (1.5x):</span><span class="report-val" id="mSunOT">₩ 0</span></div>
+            <div class="report-line"><span>🎈 Holiday OT (1.5x):</span><span class="report-val" id="mHolOT">₩ 0</span></div>
+            <div class="report-line"><span>🌙 Night Pay (3.0x):</span><span class="report-val" id="mNight">₩ 0</span></div>
+            <div class="salary-box">
+                <div style="color:#aaa; font-size:12px;">Total Salary Estimate</div>
+                <div class="total-amt">₩ <span id="finalSalary">0</span></div>
+            </div>
+            <button class="back-btn" onclick="switchToHours()">🔙 Back</button>
+        </div>
     </div>
 
-    <div id="join-modal" class="overlay hidden">
-        <h2>Enter PIN</h2>
-        <p id="target-room-name" style="font-weight:bold; color:var(--accent);"></p>
-        <input type="password" id="joinPinInput" placeholder="PIN Code">
-        <button class="btn" style="background:#2d6a4f;" onclick="verifyAndJoin()">JOIN GAME</button>
-        <p onclick="closeModals()" style="color:gray; cursor:pointer; margin-top:15px; font-size: 14px;">Cancel</p>
-    </div>
-
-    <div id="game-section" class="hidden" style="height:100%; display:flex; flex-direction:column;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <button id="close-room-btn" class="hidden" onclick="closeRoom()" style="color:red; border:2px solid red; background:none; font-size:9px; padding:3px 8px; border-radius:5px; font-weight:bold;">CLOSE ROOM</button>
-            <div id="round-info" style="font-size:14px; color:var(--primary); font-weight:bold; background:var(--gold); padding:2px 10px; border-radius:10px; color:black;">Round: 1/11</div>
-            <button onclick="location.reload()" style="color:gray; border:none; background:none; font-size:11px;">LEAVE</button>
-        </div>
-
-        <div id="lobby-ui" style="text-align:center; padding-top: 50px;">
-            <h3 id="room-title" style="color:var(--accent)"></h3>
-            <div id="p-list" style="margin:30px 0; font-weight:bold; color:var(--primary); font-size:20px; line-height: 1.8;"></div>
-            <button id="start-btn" class="btn hidden" style="font-size:18px; padding:15px;" onclick="hostStart()">START GAME 🚀</button>
-            <p id="wait-msg" style="color:#888;">Waiting for other players...</p>
-        </div>
-
-        <div id="play-ui" class="hidden" style="height:100%; display:flex; flex-direction:column;">
-            <div class="scoreboard" id="scoreboard"></div>
-            <div id="status-txt" style="text-align:center; font-weight:bold; color:var(--accent); background:#eee; padding:5px; border-radius:8px; margin-bottom:15px; font-size:14px;">-</div>
-            <div id="grid" class="grid"></div>
-        </div>
-    </div>
-
-    <div id="round-overlay" class="overlay game-overlay hidden">
-        <h1 id="r-winner" style="font-size: 32px; text-shadow: 0 0 10px var(--gold);"></h1>
-        <div id="final-controls" class="hidden" style="margin-top: 20px;">
-            <button class="btn" style="background:var(--gold); color:black; font-size: 18px;" onclick="hostResetGame()">PLAY AGAIN 🔄</button>
-            <button class="btn" style="margin-top:15px; background:transparent; border:1px solid white;" onclick="location.reload()">BACK TO HOME</button>
-        </div>
+    <div class="card" style="margin-top:15px;">
+        <label>Hourly Rate (₩)</label>
+        <input type="number" id="hourlyRate" value="9860">
+        <button class="calc-btn" onclick="calculateSalary()">Calculate Salary ₩</button>
+        <button class="photo-btn" onclick="downloadAsPhoto()">Download Photo 📸</button>
+        <button class="red-btn" onclick="resetAll()">Reset Month</button>
     </div>
 </div>
 
-<audio id="snd-eat" src="https://cdn.discordapp.com/attachments/1420003318096461825/1458783471177564282/copy_787A93B7-6439-44E4-B5C6-71E4DB2F2955.mp3?ex=6960e57a&is=695f93fa&hm=24b7a624ed49edd9fe3db9598ce5056de39ba060585e45284a78934bd75c3a33&
-    "></audio>
-<audio id="snd-poison" src="https://cdn.discordapp.com/attachments/1420003318096461825/1458766850161905675/myinstants_2.mp3?ex=6960d5ff&is=695f847f&hm=13195023991f6a8aae479f1609e9bb08d8ffcb38453caa0ad91cff6597302b17&"></audio>
+<script>
+const STORE_KEY="ronnie_pro_v4.8";
+let entries=JSON.parse(localStorage.getItem(STORE_KEY)||"[]");
+let showFullHistory = false;
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const daysArr = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const times=["5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM","10:00 PM","10:30 PM","11:00 PM","11:30 PM","12:00 AM"];
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+function showToast(msg) {
+    let x = document.getElementById("toast");
+    if(msg) x.innerText = msg;
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
 
-    const firebaseConfig = { apiKey: "AIzaSyDT6QJyFjZhjrCd-7d00IxFSlWqOBp2xY8",
-  authDomain: "poison-and-save.firebaseapp.com",
-  databaseURL: "https://poison-and-save-default-rtdb.firebaseio.com",
-  projectId: "poison-and-save",
-  storageBucket: "poison-and-save.firebasestorage.app",
-  messagingSenderId: "475847800468",
-  appId: "1:475847800468:web:93605c30c6c6c775e2a681",
-  measurementId: "G-VR6WKKB1DV"};
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+function autoDetectDay() {
+    let d = new Date(document.getElementById("inputDate").value);
+    if(isNaN(d.getTime())) return;
+    let dayNum = d.getDay(); 
+    let daySelect = document.getElementById("dayType");
+    if(dayNum === 0) daySelect.value = "sunday";
+    else if(dayNum === 6) daySelect.value = "saturday";
+    else daySelect.value = "weekday";
+    updateUI();
+}
 
-    let myRole, myName, selectedId, gameData = {};
+function updateUI(){
+    let day=document.getElementById("dayType").value;
+    let out=document.getElementById("outTime");
+    out.innerHTML="";
+    times.forEach(t=>{ let o=new Option(t, t); out.add(o); });
+    document.getElementById("workedBox").classList.toggle("hide", day==="weekday");
+}
 
-    window.onload = () => {
-        const n = localStorage.getItem('pName');
-        if(n) document.getElementById('playerName').value = n;
-        onValue(ref(db, 'rooms'), (snap) => {
-            const list = document.getElementById('active-rooms-list'); list.innerHTML = "";
-            const rooms = snap.val();
-            if(!rooms) return list.innerHTML = "<p style='text-align:center; color:#999;'>No rooms. Create one!</p>";
-            Object.keys(rooms).forEach(id => {
-                if(rooms[id].state === "waiting") {
-                    list.innerHTML += `<div class="room-card">
-                        <div><b style="color:var(--accent)">${id.toUpperCase()}</b><br><small>${rooms[id].playerCount}/4 Players</small></div>
-                        <button class="btn" style="width:70px; padding:6px; font-size:11px;" onclick="openJoinModal('${id}')">JOIN</button>
-                    </div>`;
-                }
-            });
-        });
-    };
+function saveEntry(){
+    let date = document.getElementById("inputDate").value;
+    if(!date) return alert("मिति रोज्नुहोस्!");
+    if(entries.find(e => e.date === date)) return alert("डेटा पहिल्यै छ!");
 
-    window.showCreateModal = () => document.getElementById('create-modal').classList.remove('hidden');
-    window.closeModals = () => { document.getElementById('create-modal').classList.add('hidden'); document.getElementById('join-modal').classList.add('hidden'); };
-
-    window.createNewRoom = () => {
-        const id = document.getElementById('newRoomId').value.trim().toLowerCase();
-        const pin = document.getElementById('newRoomPass').value.trim();
-        myName = document.getElementById('playerName').value.trim();
-        if(!id || !pin || !myName) return alert("All fields are required!");
-        localStorage.setItem('pName', myName);
-        myRole = "p1"; selectedId = id;
-        set(ref(db, 'rooms/'+id), { state:"waiting", pin:pin, playerCount:1, p1_name:myName, round:1, startPlayer:1, p1_score:0, p2_score:0, p3_score:0, p4_score:0 });
-        enterRoom();
-    };
-
-    window.openJoinModal = (id) => { selectedId = id; document.getElementById('target-room-name').innerText = "Joining: "+id.toUpperCase(); document.getElementById('join-modal').classList.remove('hidden'); };
-
-    window.verifyAndJoin = async () => {
-        const pin = document.getElementById('joinPinInput').value.trim();
-        myName = document.getElementById('playerName').value.trim();
-        if(!myName) return alert("Enter name!");
-        const snap = await get(ref(db, 'rooms/'+selectedId));
-        if(snap.val().pin === pin) {
-            const count = snap.val().playerCount + 1;
-            if(count > 4) return alert("Room Full!");
-            myRole = "p"+count;
-            update(ref(db, 'rooms/'+selectedId), { [`p${count}_name`]:myName, playerCount:count });
-            localStorage.setItem('pName', myName);
-            enterRoom();
-        } else alert("Wrong PIN!");
-    };
-
-    function enterRoom() {
-        closeModals();
-        document.getElementById('hub-screen').classList.add('hidden');
-        document.getElementById('game-section').classList.remove('hidden');
-        if(myRole === 'p1') document.getElementById('close-room-btn').classList.remove('hidden');
-
-        onValue(ref(db, 'rooms/'+selectedId), (snap) => {
-            gameData = snap.val();
-            if(!gameData) return location.reload();
-            document.getElementById('room-title').innerText = "ROOM: " + selectedId.toUpperCase();
-            let phtml = ""; for(let i=1; i<=4; i++) if(gameData[`p${i}_name`]) phtml += "👤 "+gameData[`p${i}_name`]+"<br>";
-            document.getElementById('p-list').innerHTML = phtml;
-            if(myRole === 'p1' && gameData.playerCount >= 2 && gameData.state === 'waiting') document.getElementById('start-btn').classList.remove('hidden');
-            else document.getElementById('start-btn').classList.add('hidden');
-            if(gameData.state !== "waiting") {
-                document.getElementById('lobby-ui').classList.add('hidden');
-                document.getElementById('play-ui').classList.remove('hidden');
-                updateGameUI();
-            }
-        });
-    }
-
-    function updateGameUI() {
-        const sb = document.getElementById('scoreboard');
-        sb.style.gridTemplateColumns = `repeat(${gameData.playerCount}, 1fr)`;
-        sb.innerHTML = "";
-        for(let i=1; i<=gameData.playerCount; i++){
-            const active = gameData.turn === `p${i}` && (gameData.state === "playing" || gameData.state === "selecting");
-            sb.innerHTML += `<div class="player-slot ${active?'active-turn':''}">
-                <div style="font-size:9px; opacity:0.7">${myRole===`p${i}`?'YOU':`P${i}`}</div>
-                <div style="font-weight:bold; overflow:hidden; text-overflow:ellipsis;">${gameData[`p${i}_name`]}</div>
-                <div style="font-size:16px; color:var(--gold)">${gameData[`p${i}_score`]||0}</div>
-            </div>`;
-        }
-        document.getElementById('round-info').innerText = `Round: ${gameData.round}/11`;
-        const st = document.getElementById('status-txt');
-        if(gameData.state === "selecting") {
-            st.innerText = gameData[myRole+"_poison"] !== undefined ? "⏳ Waiting for others..." : "💀 HIDE YOUR POISON!";
-            let all = true; for(let i=1; i<=gameData.playerCount; i++) if(gameData[`p${i}_poison`] === undefined) all = false;
-            if(all && myRole === 'p1') update(ref(db, 'rooms/'+selectedId), { state:"playing" });
-        } else if(gameData.state === "playing") {
-            st.innerText = gameData.turn === myRole ? "👉 YOUR TURN: PICK A SAFE ONE!" : "🔇 " + gameData[gameData.turn+"_name"] + " is picking...";
-        }
-
-        if(document.getElementById('grid').innerHTML==="") createGrid();
-        for(let i=0; i<12; i++) {
-            const el = document.getElementById("c-"+i);
-            if(gameData.state === "selecting") el.classList.remove('red-hit');
-            if(gameData[`rem_${i}`]) el.classList.add('removed'); else el.classList.remove('removed');
-        }
-
-        const overlay = document.getElementById('round-overlay');
-        const rWinTxt = document.getElementById('r-winner');
-        if(gameData.state === "round_ended") {
-            overlay.classList.remove('hidden');
-            rWinTxt.innerText = "⭐ " + gameData.last_win.toUpperCase() + " WINS ROUND! ⭐";
-        } else if(gameData.state === "final_ended") {
-            overlay.classList.remove('hidden');
-            rWinTxt.innerHTML = `<span style="color:var(--gold)">🏆 CHAMPION 🏆</span><br>${gameData.champion.toUpperCase()}`;
-            if(myRole === 'p1') document.getElementById('final-controls').classList.remove('hidden');
-            launchConfetti();
-        } else {
-            overlay.classList.add('hidden');
-            document.getElementById('final-controls').classList.add('hidden');
-        }
-    }
-
-    function launchConfetti() {
-        var end = Date.now() + (3 * 1000);
-        (function frame() {
-            confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#fcbf49', '#780000'] });
-            confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#fcbf49', '#780000'] });
-            if (Date.now() < end) requestAnimationFrame(frame);
-        }());
-    }
-
-    window.hostStart = () => update(ref(db, 'rooms/'+selectedId), { state:"selecting", turn:"p1", startPlayer: 1 });
-    window.closeRoom = () => { if(confirm("Close this room for everyone?")) remove(ref(db, 'rooms/'+selectedId)); };
+    let type = document.getElementById("dayType").value;
+    let outVal = document.getElementById("outTime").value;
+    let workedVal = (type==="weekday") ? "yes" : document.getElementById("worked").value;
     
-    window.hostResetGame = () => {
-        let reset = { state: "selecting", turn: "p1", round: 1, startPlayer: 1, champion: null };
-        for(let i=1; i<=4; i++) { reset[`p${i}_score`] = 0; reset[`p${i}_poison`] = null; }
-        for(let i=0; i<12; i++) reset[`rem_${i}`] = null;
-        update(ref(db, 'rooms/'+selectedId), reset);
-    };
+    let normalOt = 0, nightOt = 0, basicHrs = 0;
+    let [t, m] = outVal.split(' ');
+    let [h, min] = t.split(':').map(Number);
+    if(h===12) h=(m==='AM')?0:12; else if(m==='PM') h+=12;
+    let totalMins = (h*60)+min;
 
-    function createGrid() {
-        const g = document.getElementById('grid'); g.innerHTML = "";
-        for(let i=0; i<12; i++){
-            let d = document.createElement('div'); d.className='candy'; d.id="c-"+i; d.innerHTML="🍫";
-            d.onclick=()=>handleMove(i); g.appendChild(d);
+    if (type === "sunday" || type === "holiday") {
+        basicHrs = 8;
+        if (workedVal === "yes") {
+            normalOt = 8;
+            nightOt = Math.max(0, (totalMins - 1320) / 60);
         }
+    } else if (type === "saturday") {
+        if (workedVal === "yes") {
+            basicHrs = 0; 
+            normalOt = 8 + Math.max(0, (Math.min(totalMins, 1320) - 1050) / 60);
+            nightOt = Math.max(0, (totalMins - 1320) / 60);
+        }
+    } else {
+        basicHrs = 8;
+        normalOt = Math.max(0, (Math.min(totalMins, 1320) - 1050) / 60);
+        nightOt = Math.max(0, (totalMins - 1320) / 60);
     }
+    
+    entries.push({ date, type, worked:workedVal, normalOt, nightOt, basicHrs });
+    entries.sort((a,b)=>new Date(a.date)-new Date(b.date));
+    localStorage.setItem(STORE_KEY, JSON.stringify(entries));
+    renderHistory();
+    showToast("डाटा सेभ भयो! ✅");
+}
 
-    function handleMove(i) {
-        const rRef = ref(db, 'rooms/'+selectedId);
-        const el = document.getElementById("c-"+i);
-        if(gameData.state === "selecting" && gameData[myRole+"_poison"] === undefined) {
-            el.classList.add('red-hit');
-            setTimeout(() => { update(rRef, {[myRole+"_poison"]:i}); }, 500);
-        } else if(gameData.state === "playing" && gameData.turn === myRole) {
-            if(gameData[`rem_${i}`]) return;
-            let isP = false; for(let j=1; j<=gameData.playerCount; j++) if(i === gameData[`p${j}_poison`]) isP = true;
-            if(isP) {
-                document.getElementById('snd-poison').play();
-                el.classList.add('red-hit');
-                setTimeout(() => {
-                    let curNum = parseInt(myRole.replace("p", ""));
-                    let winIdx = curNum - 1; if(winIdx < 1) winIdx = gameData.playerCount;
-                    const w = "p"+winIdx; const nextR = gameData.round + 1;
-                    update(rRef, { state:"round_ended", last_win: gameData[w+"_name"], [w+"_score"]:(gameData[w+"_score"]||0)+1 });
-                    
-                    setTimeout(() => {
-                        if(nextR > 11) {
-                            let champ = ""; let ms = -1;
-                            for(let k=1; k<=gameData.playerCount; k++) {
-                                if(gameData[`p${k}_score`] > ms) { ms = gameData[`p${k}_score`]; champ = gameData[`p${k}_name`]; }
-                            }
-                            update(rRef, { state:"final_ended", champion: champ });
-                        } else {
-                            let lastS = gameData.startPlayer || 1;
-                            let nextS = lastS + 1; if(nextS > gameData.playerCount) nextS = 1;
-                            let res = { state:"selecting", turn: "p"+nextS, startPlayer: nextS, round: nextR };
-                            for(let k=1; k<=4; k++) res[`p${k}_poison`] = null;
-                            for(let k=0; k<12; k++) res[`rem_${k}`] = null;
-                            update(rRef, res);
-                        }
-                    }, 2500);
-                }, 600);
-            } else {
-                document.getElementById('snd-eat').play();
-                let cur = parseInt(myRole.replace("p", ""));
-                let next = cur + 1; if(next > gameData.playerCount) next = 1;
-                update(rRef, { turn: "p"+next, [`rem_${i}`]: true });
+function renderHistory(){
+    let body=document.getElementById("historyBody");
+    body.innerHTML="";
+    let displayEntries = showFullHistory ? entries : entries.slice(-5);
+    let wB=0, nOT=0, niOT=0, sD=0, suD=0, hD=0;
+    
+    entries.forEach(e => {
+        if(e.type==="weekday") { wB += e.basicHrs; nOT += e.normalOt; }
+        else if(e.type==="saturday" && e.worked==="yes") sD++;
+        else if(e.type==="sunday" && e.worked==="yes") suD++;
+        else if(e.type==="holiday" && e.worked==="yes") hD++;
+        niOT += e.nightOt;
+    });
+
+    displayEntries.forEach((e)=>{
+        let d = new Date(e.date);
+        let tr=document.createElement("tr");
+        if(e.type !== "weekday") tr.className = "holiday-row";
+        tr.innerHTML=`<td><span class="date-big">${e.date.split('-')[2]}</span><span class="month-small">${months[d.getMonth()]}</span></td>
+                      <td style="font-weight:bold">${daysArr[d.getDay()]}</td>
+                      <td>${e.basicHrs}</td>
+                      <td><b>${(e.normalOt+e.nightOt).toFixed(1)}</b></td>
+
+                      <td class="del-col"><button onclick="delEntry(${entries.indexOf(e)})">🗑️</button></td>`;
+        body.appendChild(tr);
+    });
+
+    document.getElementById("hWBasic").innerText = wB + " hrs";
+    document.getElementById("hSat").innerText = sD + " d";
+    document.getElementById("hSun").innerText = suD + " d";
+    document.getElementById("hHol").innerText = hD + " d";
+    document.getElementById("hNormalOT").innerText = nOT.toFixed(1);
+    document.getElementById("hNightOT").innerText = niOT.toFixed(1);
+}
+
+function calculateSalary() {
+    let rate = parseFloat(document.getElementById("hourlyRate").value) || 0;
+    let bP=0, suBP=0, hoBP=0, wOT=0, saOT=0, suOT=0, hoOT=0, nP=0;
+
+    entries.forEach(e => {
+        if(e.type==="weekday") {
+            bP += e.basicHrs * rate;
+            wOT += e.normalOt * rate * 1.5;
+        } else if(e.type === "sunday") {
+            suBP += e.basicHrs * rate;
+            if(e.worked === "yes") suOT += e.normalOt * rate * 1.5;
+        } else if(e.type === "holiday") {
+            hoBP += e.basicHrs * rate;
+            if(e.worked === "yes") hoOT += e.normalOt * rate * 1.5;
+        } else if(e.type === "saturday" && e.worked === "yes") {
+            saOT += e.normalOt * rate * 1.5;
+        }
+        nP += (e.nightOt * rate * 3.0); 
+    });
+
+    document.getElementById("mWBasic").innerText = "₩ " + bP.toLocaleString();
+    document.getElementById("mSunBasic").innerText = "₩ " + suBP.toLocaleString();
+    document.getElementById("mHolBasic").innerText = "₩ " + hoBP.toLocaleString();
+    document.getElementById("mWOT").innerText = "₩ " + wOT.toLocaleString();
+    document.getElementById("mSatOT").innerText = "₩ " + saOT.toLocaleString();
+    document.getElementById("mSunOT").innerText = "₩ " + suOT.toLocaleString();
+    document.getElementById("mHolOT").innerText = "₩ " + hoOT.toLocaleString();
+    document.getElementById("mNight").innerText = "₩ " + nP.toLocaleString();
+    
+    let total = bP + suBP + hoBP + wOT + saOT + suOT + hoOT + nP;
+    document.getElementById("finalSalary").innerText = Math.round(total).toLocaleString();
+    document.getElementById("hourView").classList.add("hide");
+    document.getElementById("moneyView").classList.remove("hide");
+}
+
+function switchToHours() {
+    document.getElementById("moneyView").classList.add("hide");
+    document.getElementById("hourView").classList.remove("hide");
+}
+function toggleHistory() { showFullHistory = !showFullHistory; renderHistory(); }
+function delEntry(i){ if(confirm("डिलिट गर्ने?")){ entries.splice(i,1); localStorage.setItem(STORE_KEY, JSON.stringify(entries)); renderHistory(); } }
+function resetAll(){ if(confirm("सबै सफा गर्ने?")){ entries=[]; localStorage.setItem(STORE_KEY,"[]"); renderHistory(); switchToHours(); } }
+
+function downloadAsPhoto() {
+    const area = document.getElementById('exportArea');
+    area.classList.add('exporting');
+    html2canvas(area, { scale: 2 }).then(canvas => {
+        let link = document.createElement('a');
+        link.download = `Ronnie_Payroll.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        area.classList.remove('exporting');
+    });
+}
+
+/* --- Reminder Logic --- */
+const ALARM_KEY = "ronnie_alarm_time";
+function loadReminder() {
+    const savedTime = localStorage.getItem(ALARM_KEY);
+    if(savedTime) {
+        document.getElementById("reminderTime").value = savedTime;
+        document.getElementById("reminderStatus").innerText = "Alarm set for: " + savedTime;
+        document.getElementById("reminderStatus").style.color = "green";
+    }
+}
+
+function setReminder() {
+    let t = document.getElementById("reminderTime").value;
+    if(!t) return alert("Please select a time first.");
+    
+    if (!("Notification" in window)) {
+        alert("This browser does not support desktop notification");
+    } else if (Notification.permission !== "granted") {
+        Notification.requestPermission().then(permission => {
+            if(permission === "granted"){
+                saveAlarmToLocal(t);
             }
+        });
+    } else {
+        saveAlarmToLocal(t);
+    }
+}
+
+function saveAlarmToLocal(t) {
+    localStorage.setItem(ALARM_KEY, t);
+    document.getElementById("reminderStatus").innerText = "Alarm set for: " + t;
+    document.getElementById("reminderStatus").style.color = "green";
+    showToast("Reminder Set! ⏰");
+    // Test notification immediately to confirm permission
+    new Notification("Ronnie Payroll", { body: "Notification Test Successful! ✅" });
+}
+
+// Check time every 30 seconds
+setInterval(() => {
+    let savedTime = localStorage.getItem(ALARM_KEY);
+    if(savedTime) {
+        let now = new Date();
+        let current = now.toTimeString().substring(0, 5); // HH:MM
+        if(current === savedTime && now.getSeconds() < 30) { // Trigger only within the minute
+            new Notification("Ronnie Payroll", { 
+                body: "Time to fill your payroll! 📝",
+                icon: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            });
         }
     }
+}, 30000);
+
+document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
+autoDetectDay(); renderHistory(); loadReminder();
 </script>
 </body>
 </html>
