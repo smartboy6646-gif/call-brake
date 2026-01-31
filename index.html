@@ -3,36 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Call Break Pro - 5 Rounds</title>
+    <title>Call Break Pro - Fixed</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
-        body { margin: 0; background: #0f2027; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
-        .overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 30, 48, 0.95); padding: 25px; border-radius: 15px; text-align: center; z-index: 100; border: 2px solid #d4af37; box-shadow: 0 0 30px rgba(0,0,0,0.8); min-width: 320px; max-height: 80vh; overflow-y: auto; }
+        body { margin: 0; background: #0f2027; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; user-select: none; }
+        
+        /* Orientation Warning */
+        #rotate-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        @media screen and (orientation: portrait) { #rotate-warning { display: flex; } }
+        
+        .overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 30, 48, 0.98); padding: 25px; border-radius: 15px; text-align: center; z-index: 100; border: 2px solid #d4af37; box-shadow: 0 0 30px rgba(0,0,0,0.8); min-width: 320px; max-height: 80vh; overflow-y: auto; }
         .hidden { display: none !important; }
-        button { padding: 12px 20px; background: linear-gradient(145deg, #d4af37, #b8962e); border: none; color: black; font-weight: bold; cursor: pointer; border-radius: 8px; margin: 5px; transition: 0.3s; }
+        
+        button { padding: 12px 20px; background: linear-gradient(145deg, #d4af37, #b8962e); border: none; color: black; font-weight: bold; cursor: pointer; border-radius: 8px; margin: 5px; transition: 0.3s; font-size: 16px; }
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
         
-        #bid-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
-        #view-score-btn { position: fixed; top: 10px; right: 10px; z-index: 50; padding: 8px 15px; font-size: 12px; background: rgba(0,0,0,0.5); color: #d4af37; border: 1px solid #d4af37; }
+        #bid-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        #view-score-btn { position: fixed; top: 10px; right: 10px; z-index: 50; padding: 8px 15px; font-size: 14px; background: rgba(0,0,0,0.6); color: #d4af37; border: 1px solid #d4af37; border-radius: 5px; cursor: pointer; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; color: white; font-size: 13px; }
-        th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; color: white; font-size: 14px; }
+        th, td { border: 1px solid #444; padding: 8px; text-align: center; }
         th { background: #d4af37; color: black; }
         .rank-1 { color: #ffd700; font-weight: bold; } 
         
-        #notification { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: rgba(212, 175, 55, 0.9); color: black; padding: 10px 30px; border-radius: 30px; font-weight: bold; z-index: 200; display: none; }
+        #notification { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: rgba(212, 175, 55, 0.95); color: black; padding: 12px 30px; border-radius: 30px; font-weight: bold; z-index: 200; display: none; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
+
+    <div id="rotate-warning">
+        <h1 style="color:#d4af37; font-size: 50px;">↻</h1>
+        <h3>Please Rotate Your Device</h3>
+        <p>This game is best played in landscape mode.</p>
+    </div>
 
     <button id="view-score-btn" onclick="toggleScoreboard()">📊 Scores</button>
 
     <div id="login-screen" class="overlay">
         <h2 style="color:#d4af37">♠ Call Break Pro</h2>
-        <input type="text" id="p-name" placeholder="Name" style="padding:10px; width:80%; margin-bottom:10px; border-radius:5px; border:none;">
-        <input type="text" id="r-id" placeholder="Room ID" style="padding:10px; width:80%; margin-bottom:20px; border-radius:5px; border:none;">
+        <input type="text" id="p-name" placeholder="Name" style="padding:12px; width:80%; margin-bottom:10px; border-radius:5px; border:none; font-size:16px;">
+        <input type="text" id="r-id" placeholder="Room ID" style="padding:12px; width:80%; margin-bottom:20px; border-radius:5px; border:none; font-size:16px;">
         <br>
         <button onclick="startGame()">Join Game</button>
+        <p style="font-size:12px; color:#aaa; margin-top:10px;">ID is saved for reconnecting.</p>
     </div>
 
     <div id="bid-screen" class="overlay hidden">
@@ -71,55 +84,76 @@
         let game, roomId, myId, mySeat, gameData;
         const rankVal = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14};
         
+        // --- Auto Login Check ---
+        window.onload = () => {
+            const savedName = localStorage.getItem('cb_name');
+            const savedRoom = localStorage.getItem('cb_room');
+            if(savedName) document.getElementById('p-name').value = savedName;
+            if(savedRoom) document.getElementById('r-id').value = savedRoom;
+        };
+
         class MainScene extends Phaser.Scene {
             constructor() { super('MainScene'); }
 
             create() {
                 this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x163020).setOrigin(0);
                 
-                this.roundText = this.add.text(20, 20, 'Round: 1 / 5', { 
-                    fontSize: '18px', 
+                this.roundText = this.add.text(20, 20, '', { 
+                    fontSize: '20px', 
                     fontFamily: 'Segoe UI',
                     color: '#d4af37', 
                     fontStyle: 'bold',
                     backgroundColor: '#00000088',
-                    padding: { x: 10, y: 5 }
+                    padding: { x: 12, y: 8 }
                 }).setScrollFactor(0).setDepth(100);
 
+                this.selectedCardIndex = -1; // Track selected card index
                 this.createCardTextures();
                 this.playerTexts = [];
                 const w = this.scale.width, h = this.scale.height;
-                const positions = [{x: w/2, y: h - 110}, {x: 60, y: h/2}, {x: w/2, y: 60}, {x: w - 60, y: h/2}];
+                const positions = [{x: w/2, y: h - 140}, {x: 70, y: h/2}, {x: w/2, y: 70}, {x: w - 70, y: h/2}];
 
                 positions.forEach((p, i) => {
-                    this.playerTexts.push(this.add.text(p.x, p.y, '', { fontSize: '14px', backgroundColor: '#00000088', padding: 5, align: 'center' }).setOrigin(0.5));
+                    this.playerTexts.push(this.add.text(p.x, p.y, '', { fontSize: '16px', backgroundColor: '#00000099', padding: 8, align: 'center', fontFamily: 'Arial' }).setOrigin(0.5));
                 });
 
                 onValue(ref(db, 'rooms/' + roomId), (snap) => {
                     const val = snap.val();
                     if(val) { gameData = val; this.updateUI(val); }
                 });
+
+                // Global input listener to deselect card if clicked elsewhere
+                this.input.on('pointerdown', (pointer, gameObjects) => {
+                    if (gameObjects.length === 0) {
+                        this.selectedCardIndex = -1;
+                        this.updateHandVisuals(gameData);
+                    }
+                });
             }
 
+            // --- CHANGED: Bigger Cards (110 x 150) ---
             createCardTextures() {
                 ['S','H','D','C'].forEach(suit => {
                     ['2','3','4','5','6','7','8','9','10','J','Q','K','A'].forEach(rank => {
                         const key = `card_${suit}_${rank}`;
                         if (this.textures.exists(key)) return;
-                        const canvas = this.textures.createCanvas(key, 80, 110);
+                        const canvas = this.textures.createCanvas(key, 110, 150);
                         const ctx = canvas.getContext();
-                        ctx.fillStyle = 'white'; ctx.beginPath(); this.roundRect(ctx,0,0,80,110,8); ctx.fill();
-                        ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
+                        ctx.fillStyle = 'white'; ctx.beginPath(); this.roundRect(ctx,0,0,110,150,10); ctx.fill();
+                        ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
                         ctx.fillStyle = (suit==='H'||suit==='D')?'#d00':'#000';
-                        ctx.font = 'bold 16px Arial'; ctx.fillText(rank, 5, 20);
-                        ctx.font = '24px Arial'; ctx.fillText({S:'♠',H:'♥',D:'♦',C:'♣'}[suit], 30, 65);
+                        ctx.font = 'bold 24px Arial'; ctx.fillText(rank, 8, 30);
+                        ctx.font = '40px Arial'; ctx.fillText({S:'♠',H:'♥',D:'♦',C:'♣'}[suit], 35, 90);
+                        ctx.font = 'bold 24px Arial'; 
+                        // Bottom right number (inverted logic simplified for canvas)
+                        ctx.fillText(rank, 80, 140); 
                         canvas.refresh();
                     });
                 });
-                const back = this.textures.createCanvas('card_back', 80, 110);
+                const back = this.textures.createCanvas('card_back', 110, 150);
                 const btx = back.getContext();
-                btx.fillStyle = '#2c3e50'; btx.beginPath(); this.roundRect(btx,0,0,80,110,8); btx.fill();
-                btx.strokeStyle = '#d4af37'; btx.lineWidth = 4; btx.stroke();
+                btx.fillStyle = '#2c3e50'; btx.beginPath(); this.roundRect(btx,0,0,110,150,10); btx.fill();
+                btx.strokeStyle = '#d4af37'; btx.lineWidth = 5; btx.stroke();
                 back.refresh();
             }
 
@@ -128,9 +162,7 @@
             }
 
             updateUI(data) {
-                if(this.roundText) {
-                    this.roundText.setText(`Round: ${data.currentRound || 1} / 5`);
-                }
+                if(this.roundText) this.roundText.setText(`Round: ${data.currentRound || 1} / 5`);
 
                 this.children.list.filter(c => c.getData('isCard')).forEach(c => c.destroy());
                 if(mySeat === undefined) mySeat = data.players.findIndex(p => p.id === myId);
@@ -138,8 +170,9 @@
                 data.players.forEach((p, i) => {
                     const rel = (i - mySeat + 4) % 4;
                     const isTurn = data.turn === i && data.status === 'playing';
-                    this.playerTexts[rel].setText(`${p.name}\n${isTurn ? '⭐ ' : ''}Bid: ${p.bid} | Won: ${p.tricks}`);
-                    this.playerTexts[rel].setStyle({ color: isTurn ? '#d4af37' : '#fff' });
+                    const isDealer = data.dealer === i;
+                    this.playerTexts[rel].setText(`${isDealer ? 'Ⓓ ' : ''}${p.name}\n${isTurn ? '⭐ ' : ''}Bid: ${p.bid} | Won: ${p.tricks}`);
+                    this.playerTexts[rel].setStyle({ color: isTurn ? '#d4af37' : '#fff', stroke: isTurn ? '#d4af37' : '#000', strokeThickness: isTurn ? 1 : 0 });
                 });
 
                 if(data.status === 'bidding' && data.turn === mySeat) {
@@ -148,23 +181,61 @@
                     document.getElementById('bid-screen').classList.add('hidden');
                 }
 
-                const hand = data.players[mySeat].hand || [];
-                hand.sort((a,b) => (a.s === b.s) ? rankVal[a.r] - rankVal[b.r] : a.s.localeCompare(b.s));
-                hand.forEach((card, i) => {
-                    const x = (this.scale.width/2 - (hand.length*20)/2) + (i*25);
-                    const cS = this.add.sprite(x, this.scale.height - 60, `card_${card.s}_${card.r}`).setInteractive().setData('isCard', true);
-                    const isValid = this.isMoveValid(card, hand, data.currentTrick || [], data.leadSuit);
-                    if(data.turn !== mySeat || !isValid) cS.setAlpha(0.5);
-                    cS.on('pointerdown', () => { if(data.turn === mySeat && isValid) this.playCard(card, i, data); });
-                });
+                this.renderHand(data);
 
                 (data.currentTrick || []).forEach(t => {
                     const rel = (t.pIdx - mySeat + 4) % 4;
-                    const pos = [{x:this.scale.width/2, y:this.scale.height/2+50}, {x:this.scale.width/2-70, y:this.scale.height/2}, {x:this.scale.width/2, y:this.scale.height/2-50}, {x:this.scale.width/2+70, y:this.scale.height/2}][rel];
-                    this.add.sprite(pos.x, pos.y, `card_${t.card.s}_${t.card.r}`).setScale(0.8).setData('isCard', true);
+                    const pos = [{x:this.scale.width/2, y:this.scale.height/2+60}, {x:this.scale.width/2-90, y:this.scale.height/2}, {x:this.scale.width/2, y:this.scale.height/2-60}, {x:this.scale.width/2+90, y:this.scale.height/2}][rel];
+                    this.add.sprite(pos.x, pos.y, `card_${t.card.s}_${t.card.r}`).setScale(0.85).setData('isCard', true);
                 });
 
                 if(data.status === 'round_end') showScoreboard(data);
+            }
+
+            renderHand(data) {
+                const hand = data.players[mySeat].hand || [];
+                // Sort hand
+                hand.sort((a,b) => (a.s === b.s) ? rankVal[a.r] - rankVal[b.r] : a.s.localeCompare(b.s));
+                
+                const cardWidth = 110;
+                const overlap = hand.length > 5 ? 40 : 50; 
+                const totalWidth = (hand.length - 1) * overlap + cardWidth;
+                const startX = (this.scale.width - totalWidth) / 2 + (cardWidth/2);
+
+                hand.forEach((card, i) => {
+                    const x = startX + (i * overlap);
+                    // --- TWO-TAP LOGIC: If selected, move Y up ---
+                    const isSelected = (i === this.selectedCardIndex);
+                    const y = this.scale.height - (isSelected ? 100 : 75);
+
+                    const cS = this.add.sprite(x, y, `card_${card.s}_${card.r}`).setInteractive().setData('isCard', true);
+                    
+                    const isValid = this.isMoveValid(card, hand, data.currentTrick || [], data.leadSuit);
+                    
+                    if(data.turn !== mySeat || !isValid) {
+                        cS.setTint(0x888888); // Grey out invalid
+                    }
+
+                    cS.on('pointerdown', (pointer) => {
+                        pointer.event.stopPropagation(); // Prevent global click
+                        if(data.turn !== mySeat || !isValid) return;
+
+                        if (this.selectedCardIndex === i) {
+                            // Second click on same card -> PLAY
+                            this.playCard(card, i, data);
+                            this.selectedCardIndex = -1;
+                        } else {
+                            // First click -> SELECT
+                            this.selectedCardIndex = i;
+                            this.updateHandVisuals(data); // Redraw to show lift
+                        }
+                    });
+                });
+            }
+
+            updateHandVisuals(data) {
+                // Just calling updateUI triggers re-render of hand with new Y positions
+                this.updateUI(data); 
             }
 
             isMoveValid(card, hand, trick, lead) {
@@ -204,7 +275,7 @@
                 update(ref(db, 'rooms/'+roomId), { players: p, currentTrick: newTrick, leadSuit: data.leadSuit || card.s, turn: (mySeat+1)%4 });
                 
                 if(newTrick.length === 4) {
-                    setTimeout(() => this.resolveTrick(newTrick, p), 1000);
+                    setTimeout(() => this.resolveTrick(newTrick, p), 1200); // Slightly slower for drama
                 }
             }
 
@@ -222,7 +293,7 @@
                 const dest = [{x:this.scale.width/2, y:this.scale.height}, {x:0, y:this.scale.height/2}, {x:this.scale.width/2, y:0}, {x:this.scale.width, y:this.scale.height/2}][rel];
                 
                 this.children.list.filter(c => c.getData('isCard') && !c.input).forEach(c => {
-                    this.tweens.add({ targets: c, x: dest.x, y: dest.y, alpha: 0, duration: 500 });
+                    this.tweens.add({ targets: c, x: dest.x, y: dest.y, alpha: 0, duration: 600 });
                 });
 
                 setTimeout(() => {
@@ -238,7 +309,7 @@
                     } else {
                         update(ref(db, 'rooms/'+roomId), { players, currentTrick: [], turn: winnerSeat, leadSuit: '' });
                     }
-                }, 600);
+                }, 700);
             }
         }
 
@@ -246,13 +317,29 @@
             const name = document.getElementById('p-name').value;
             roomId = document.getElementById('r-id').value;
             if(!name || !roomId) return;
-            myId = name + Date.now();
+            
+            // --- FIX: Persistent ID ---
+            let storedId = localStorage.getItem('cb_id');
+            if(storedId) {
+                myId = storedId; 
+            } else {
+                myId = name + Date.now();
+                localStorage.setItem('cb_id', myId);
+            }
+            localStorage.setItem('cb_name', name);
+            localStorage.setItem('cb_room', roomId);
+            // --------------------------
+
             document.getElementById('login-screen').classList.add('hidden');
             
             const rRef = ref(db, 'rooms/' + roomId);
             const snap = await get(rRef);
             let p = snap.exists() ? snap.val().players : [];
-            if(p.length < 4) {
+            
+            // Check if player already exists in room (Rejoin)
+            const existingPlayer = p.find(pl => pl.id === myId);
+            
+            if(!existingPlayer && p.length < 4) {
                 p.push({id: myId, name, bid:0, tricks:0, hand:[], totalScore:0, roundScores: {}});
                 update(rRef, {players: p, status: p.length===4 ? 'waiting' : 'waiting'});
             }
@@ -262,16 +349,30 @@
             onValue(rRef, (s) => {
                 const d = s.val();
                 if(d && d.status==='waiting' && d.players.length===4 && d.players[0].id===myId) {
-                    dealCards(d.players, 1);
+                    // Initial Deal: Dealer 0, Round 1
+                    dealCards(d.players, 1, 0);
                 }
             });
         };
 
-        window.dealCards = (players, round) => {
+        // --- UPDATED: Dealer Logic ---
+        window.dealCards = (players, round, dealerIdx) => {
             let deck = []; ['S','H','D','C'].forEach(s => ['2','3','4','5','6','7','8','9','10','J','Q','K','A'].forEach(r => deck.push({s,r})));
             deck.sort(() => Math.random() - 0.5);
             players.forEach((p, i) => { p.hand = deck.slice(i*13, (i+1)*13); p.bid = 0; p.tricks = 0; });
-            update(ref(db, 'rooms/'+roomId), { players, status: 'bidding', turn: 0, currentRound: round, currentTrick: [], leadSuit: '' });
+            
+            // Turn starts next to dealer
+            const startTurn = (dealerIdx + 1) % 4;
+            
+            update(ref(db, 'rooms/'+roomId), { 
+                players, 
+                status: 'bidding', 
+                turn: startTurn, 
+                dealer: dealerIdx, // Save dealer info
+                currentRound: round, 
+                currentTrick: [], 
+                leadSuit: '' 
+            });
         };
 
         const bDiv = document.getElementById('bid-options');
@@ -279,30 +380,35 @@
             const btn = document.createElement('button'); btn.innerText = i;
             btn.onclick = () => {
                 const p = [...gameData.players]; p[mySeat].bid = i;
-                const nextTurn = (gameData.turn + 1);
-                if(nextTurn === 4) {
+                const nextTurn = (gameData.turn + 1) % 4; // Ensure 0-3 loop
+                
+                // Check if everyone has bid
+                // Logic: StartTurn is (Dealer+1)%4. Bidding ends when turn returns to StartTurn.
+                const startTurn = (gameData.dealer + 1) % 4;
+                
+                if(nextTurn === startTurn) {
                     const total = p.reduce((s, pl) => s + pl.bid, 0);
-                    // --- CHANGED LOGIC HERE ---
                     if(total < 10) {
-                        // 1. Give Points (Bid + 0.1)
                         p.forEach(pl => {
                             if(!pl.roundScores) pl.roundScores = {};
                             pl.roundScores[gameData.currentRound] = pl.bid + 0.1;
                             pl.totalScore = Object.values(pl.roundScores).reduce((a,b) => a+b, 0);
                         });
 
-                        // 2. Check if Game Over (Round 5)
                         if (gameData.currentRound >= 5) {
-                            update(ref(db, 'rooms/'+roomId), { players: p, status: 'round_end', currentTrick: [], currentRound: gameData.currentRound });
+                             update(ref(db, 'rooms/'+roomId), { players: p, status: 'round_end', currentRound: gameData.currentRound });
                         } else {
-                            // 3. Move to NEXT Round
-                            dealCards(p, gameData.currentRound + 1);
+                            // Points added, but same dealer deals again for next round? 
+                            // Or proceed to next round completely. User said "Round ma count hune".
+                            // So we move to next round -> Next Dealer.
+                            const nextDealer = (gameData.dealer + 1) % 4;
+                            dealCards(p, gameData.currentRound + 1, nextDealer);
                         }
                         showToast("Total < 10: Bonus Points! Next Round.");
                     } else {
-                        update(ref(db, 'rooms/'+roomId), { players: p, status: 'playing', turn: 0 });
+                        // Start Playing. First turn to play is same as first turn to bid (next to dealer)
+                        update(ref(db, 'rooms/'+roomId), { players: p, status: 'playing', turn: startTurn });
                     }
-                    // --------------------------
                 } else {
                     update(ref(db, 'rooms/'+roomId), { players: p, turn: nextTurn });
                 }
@@ -342,13 +448,14 @@
         };
 
         window.nextRound = () => {
-            dealCards(gameData.players, gameData.currentRound + 1);
+            const nextDealer = (gameData.dealer + 1) % 4;
+            dealCards(gameData.players, gameData.currentRound + 1, nextDealer);
             document.getElementById('score-screen').classList.add('hidden');
         };
 
         window.resetWholeGame = () => {
             const p = gameData.players.map(pl => ({...pl, totalScore: 0, roundScores: {}, tricks: 0, bid: 0}));
-            dealCards(p, 1);
+            dealCards(p, 1, 0); // Reset: Round 1, Dealer 0
             document.getElementById('game-over-controls').classList.add('hidden');
             document.getElementById('score-screen').classList.add('hidden');
         };
