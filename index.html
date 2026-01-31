@@ -1,358 +1,359 @@
 <!DOCTYPE html>
-<html lang="ne">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Ronnie Payroll Pro v4.9 (With Reminder)</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<style>
-:root { --primary: #2962ff; --bg: #f0f4f8; --card-bg: #ffffff; --text: #333; --red-highlight: #d32f2f; --green: #4caf50; }
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);}
-.container{max-width:420px;margin:auto;padding:12px;}
-h2{text-align:center;color:var(--primary);margin-bottom:15px;}
-.card{background:var(--card-bg);padding:16px;border-radius:16px;margin-bottom:12px;box-shadow:0 8px 20px rgba(0,0,0,.05); position: relative;}
-label{font-size:11px;color:var(--primary);font-weight:bold;display:block;margin-bottom:4px;text-transform:uppercase;}
-select, input[type="date"], input[type="number"], input[type="time"] {
-    width: 100%; height: 48px; padding: 0 12px; font-size: 16px; border-radius: 12px; 
-    border: 1.5px solid #d1d9e6; margin-bottom: 12px; box-sizing: border-box; 
-    background-color: #fcfcfc; outline: none; color: #333; display: block; -webkit-appearance: none;
-}
-.btn-save {width: 100%; height: 50px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-th{color:#90a4ae; padding-bottom:8px; text-align: center;}
-td{padding:10px 2px; border-bottom:1px solid #f9f9f9; text-align:center;}
-.date-big { font-size: 18px; font-weight: 900; color: #000; display: block; }
-.month-small { font-size: 10px; color: #666; font-weight: normal; text-transform: uppercase; }
-.holiday-row { background-color: var(--red-highlight) !important; color: white !important; }
-.report-card { background: #0a192f; color: #fff; padding: 20px; border-radius: 16px; margin-top: 10px; }
-.report-title{font-size:18px;font-weight:bold;margin-bottom:12px;color: var(--green); border-bottom: 1px solid #1e2d4d; padding-bottom: 8px;}
-.report-line{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px;}
-.report-val{font-weight:bold; color: #fff;}
-.salary-box{background:#112240;padding:15px;border-radius:12px;margin-top:10px;text-align:center;}
-.total-amt{font-size:28px;color:var(--green);font-weight:bold;margin:5px 0;}
-.calc-btn {width: 100%; height: 48px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin: 10px 0; cursor: pointer;}
-.back-btn {width: 100%; height: 48px; background: #546e7a; color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 10px; cursor: pointer;}
-.photo-btn {width: 100%; height: 48px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;}
-.red-btn{background:#d32f2f; width: 100%; height: 35px; color: #fff; border: none; border-radius: 8px; margin-top: 10px; cursor: pointer;}
-.show-more-btn { background: #eceff1; color: #546e7a; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 8px; margin-top: 10px; cursor: pointer; }
-.reminder-btn { width: 100%; height: 40px; background: #ff9800; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 5px;}
-.hide{display:none;}
-.exporting .del-col, .exporting .show-more-btn, .exporting .back-btn, .exporting .reminder-card { display: none !important; }
-
-#toast {
-    visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
-    text-align: center; border-radius: 12px; padding: 16px; position: fixed;
-    z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%);
-    font-size: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-#toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-@keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-@keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Call Break Pro - 5 Rounds</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+        body { margin: 0; background: #0f2027; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+        .overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 30, 48, 0.95); padding: 25px; border-radius: 15px; text-align: center; z-index: 100; border: 2px solid #d4af37; box-shadow: 0 0 30px rgba(0,0,0,0.8); min-width: 320px; max-height: 80vh; overflow-y: auto; }
+        .hidden { display: none !important; }
+        button { padding: 12px 20px; background: linear-gradient(145deg, #d4af37, #b8962e); border: none; color: black; font-weight: bold; cursor: pointer; border-radius: 8px; margin: 5px; transition: 0.3s; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4); }
+        
+        #bid-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        #view-score-btn { position: fixed; top: 10px; right: 10px; z-index: 50; padding: 8px 15px; font-size: 12px; background: rgba(0,0,0,0.5); color: #d4af37; border: 1px solid #d4af37; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; color: white; font-size: 13px; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: center; }
+        th { background: #d4af37; color: black; }
+        .rank-1 { color: #ffd700; font-weight: bold; } 
+        
+        #notification { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: rgba(212, 175, 55, 0.9); color: black; padding: 10px 30px; border-radius: 30px; font-weight: bold; z-index: 200; display: none; }
+    </style>
 </head>
 <body>
-<div class="container">
-    <h2>Ronnie Ruchal</h2>
-    <div id="toast">डाटा सेभ भयो! ✅</div>
 
-    <div class="card">
-        <label>Select Date</label>
-        <input type="date" id="inputDate" onchange="autoDetectDay()">
-        <label>Day Type</label>
-        <select id="dayType" onchange="updateUI()">
-            <option value="weekday">Weekday (Mon-Fri)</option>
-            <option value="saturday">Saturday</option>
-            <option value="sunday">Sunday</option>
-            <option value="holiday">Public Holiday</option>
-        </select>
-        <div id="workedBox" class="hide">
-            <label>Worked Today?</label>
-            <select id="worked" onchange="updateUI()">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-        </div>
-        <div id="outBox"><label>Out Time</label><select id="outTime"></select></div>
-        <button class="btn-save" onclick="saveEntry()">Save Entry 💾</button>
+    <button id="view-score-btn" onclick="toggleScoreboard()">📊 Scores</button>
+
+    <div id="login-screen" class="overlay">
+        <h2 style="color:#d4af37">♠ Call Break Pro</h2>
+        <input type="text" id="p-name" placeholder="Name" style="padding:10px; width:80%; margin-bottom:10px; border-radius:5px; border:none;">
+        <input type="text" id="r-id" placeholder="Room ID" style="padding:10px; width:80%; margin-bottom:20px; border-radius:5px; border:none;">
+        <br>
+        <button onclick="startGame()">Join Game</button>
     </div>
 
-    <div class="card reminder-card">
-        <label>⏰ Daily Reminder (नोटिफिकेसन)</label>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <input type="time" id="reminderTime" style="margin-bottom:0;">
-            <button class="reminder-btn" style="width: 80px; margin:0;" onclick="setReminder()">ON ✅</button>
-        </div>
-        <div id="reminderStatus" style="font-size:12px; color:#666; margin-top:8px; text-align:center;">
-            Not set
-        </div>
+    <div id="bid-screen" class="overlay hidden">
+        <h3 id="bid-title">Your Bid</h3>
+        <div id="bid-options"></div>
     </div>
 
-    <div id="exportArea">
-        <div class="card" style="margin-bottom:0; border-radius: 16px 16px 0 0;">
-            <label style="margin-bottom:10px;">History (OT Records)</label>
-            <table>
-                <thead><tr><th>Date</th><th>Day</th><th>Basic</th><th>OT</th><th class="del-col">Del</th></tr></thead>
-                <tbody id="historyBody"></tbody>
-            </table>
-            <button id="showMoreBtn" class="show-more-btn" onclick="toggleHistory()">Show More 🔽</button>
+    <div id="score-screen" class="overlay hidden">
+        <h2 style="color:#d4af37">🏆 Scoreboard</h2>
+        <div id="score-content"></div>
+        <div id="game-over-controls" class="hidden">
+            <h3 style="color:#ff4444">Game Over!</h3>
+            <button onclick="resetWholeGame()">Play Again</button>
         </div>
-
-        <div id="hourView" class="report-card" style="margin-top:0; border-radius: 0 0 16px 16px;">
-            <div class="report-title">Monthly Summary</div>
-            <div class="report-line"><span>📅 Weekday Basic:</span><span class="report-val" id="hWBasic">0 hrs</span></div>
-            <div class="report-line"><span>🗓️ Saturday Days:</span><span class="report-val" id="hSat">0 d</span></div>
-            <div class="report-line"><span>☀️ Sunday Days:</span><span class="report-val" id="hSun">0 d</span></div>
-            <div class="report-line"><span>🎈 Holiday Days:</span><span class="report-val" id="hHol">0 d</span></div>
-            <div class="report-line"><span>⚙️ Normal OT (Hrs):</span><span class="report-val" id="hNormalOT">0.0</span></div>
-            <div class="report-line"><span>🌙 Night OT (Hrs):</span><span class="report-val" id="hNightOT">0.0</span></div>
-            <div class="salary-box"><div class="total-amt">₩ 0</div></div>
-        </div>
-
-        <div id="moneyView" class="report-card hide" style="margin-top:0; border-radius: 0 0 16px 16px;">
-            <div class="report-title">Salary Breakdown</div>
-            <div class="report-line"><span>📅 Basic (Mon-Fri):</span><span class="report-val" id="mWBasic">₩ 0</span></div>
-            <div class="report-line"><span>☀️ Sunday Basic:</span><span class="report-val" id="mSunBasic">₩ 0</span></div>
-            <div class="report-line"><span>🎈 Holiday Basic:</span><span class="report-val" id="mHolBasic">₩ 0</span></div>
-            <div class="report-line"><span>⚙️ Weekday OT (1.5x):</span><span class="report-val" id="mWOT">₩ 0</span></div>
-            <div class="report-line"><span>🗓️ Saturday OT (1.5x):</span><span class="report-val" id="mSatOT">₩ 0</span></div>
-            <div class="report-line"><span>☀️ Sunday OT (1.5x):</span><span class="report-val" id="mSunOT">₩ 0</span></div>
-            <div class="report-line"><span>🎈 Holiday OT (1.5x):</span><span class="report-val" id="mHolOT">₩ 0</span></div>
-            <div class="report-line"><span>🌙 Night Pay (3.0x):</span><span class="report-val" id="mNight">₩ 0</span></div>
-            <div class="salary-box">
-                <div style="color:#aaa; font-size:12px;">Total Salary Estimate</div>
-                <div class="total-amt">₩ <span id="finalSalary">0</span></div>
-            </div>
-            <button class="back-btn" onclick="switchToHours()">🔙 Back</button>
-        </div>
+        <button id="close-score-btn" onclick="toggleScoreboard()" style="background:#555; color:white;">Close</button>
+        <button id="host-next-btn" class="hidden" onclick="nextRound()">Next Round</button>
     </div>
 
-    <div class="card" style="margin-top:15px;">
-        <label>Hourly Rate (₩)</label>
-        <input type="number" id="hourlyRate" value="9860">
-        <button class="calc-btn" onclick="calculateSalary()">Calculate Salary ₩</button>
-        <button class="photo-btn" onclick="downloadAsPhoto()">Download Photo 📸</button>
-        <button class="red-btn" onclick="resetAll()">Reset Month</button>
-    </div>
-</div>
+    <div id="notification"></div>
+    <div id="game-container"></div>
 
-<script>
-const STORE_KEY="ronnie_pro_v4.8";
-let entries=JSON.parse(localStorage.getItem(STORE_KEY)||"[]");
-let showFullHistory = false;
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const daysArr = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-const times=["5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM","10:00 PM","10:30 PM","11:00 PM","11:30 PM","12:00 AM"];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-function showToast(msg) {
-    let x = document.getElementById("toast");
-    if(msg) x.innerText = msg;
-    x.className = "show";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-}
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKKAxKTFJcMDmj6j21nKHwlSpwAxsw57k",
+            authDomain: "call-breke.firebaseapp.com",
+            databaseURL: "https://call-breke-default-rtdb.firebaseio.com",
+            projectId: "call-breke",
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-function autoDetectDay() {
-    let d = new Date(document.getElementById("inputDate").value);
-    if(isNaN(d.getTime())) return;
-    let dayNum = d.getDay(); 
-    let daySelect = document.getElementById("dayType");
-    if(dayNum === 0) daySelect.value = "sunday";
-    else if(dayNum === 6) daySelect.value = "saturday";
-    else daySelect.value = "weekday";
-    updateUI();
-}
+        let game, roomId, myId, mySeat, gameData;
+        const rankVal = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13,'A':14};
+        
+        class MainScene extends Phaser.Scene {
+            constructor() { super('MainScene'); }
 
-function updateUI(){
-    let day=document.getElementById("dayType").value;
-    let out=document.getElementById("outTime");
-    out.innerHTML="";
-    times.forEach(t=>{ let o=new Option(t, t); out.add(o); });
-    document.getElementById("workedBox").classList.toggle("hide", day==="weekday");
-}
+            create() {
+                this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x163020).setOrigin(0);
+                
+                this.roundText = this.add.text(20, 20, 'Round: 1 / 5', { 
+                    fontSize: '18px', 
+                    fontFamily: 'Segoe UI',
+                    color: '#d4af37', 
+                    fontStyle: 'bold',
+                    backgroundColor: '#00000088',
+                    padding: { x: 10, y: 5 }
+                }).setScrollFactor(0).setDepth(100);
 
-function saveEntry(){
-    let date = document.getElementById("inputDate").value;
-    if(!date) return alert("मिति रोज्नुहोस्!");
-    if(entries.find(e => e.date === date)) return alert("डेटा पहिल्यै छ!");
+                this.createCardTextures();
+                this.playerTexts = [];
+                const w = this.scale.width, h = this.scale.height;
+                const positions = [{x: w/2, y: h - 110}, {x: 60, y: h/2}, {x: w/2, y: 60}, {x: w - 60, y: h/2}];
 
-    let type = document.getElementById("dayType").value;
-    let outVal = document.getElementById("outTime").value;
-    let workedVal = (type==="weekday") ? "yes" : document.getElementById("worked").value;
-    
-    let normalOt = 0, nightOt = 0, basicHrs = 0;
-    let [t, m] = outVal.split(' ');
-    let [h, min] = t.split(':').map(Number);
-    if(h===12) h=(m==='AM')?0:12; else if(m==='PM') h+=12;
-    let totalMins = (h*60)+min;
+                positions.forEach((p, i) => {
+                    this.playerTexts.push(this.add.text(p.x, p.y, '', { fontSize: '14px', backgroundColor: '#00000088', padding: 5, align: 'center' }).setOrigin(0.5));
+                });
 
-    if (type === "sunday" || type === "holiday") {
-        basicHrs = 8;
-        if (workedVal === "yes") {
-            normalOt = 8;
-            nightOt = Math.max(0, (totalMins - 1320) / 60);
-        }
-    } else if (type === "saturday") {
-        if (workedVal === "yes") {
-            basicHrs = 0; 
-            normalOt = 8 + Math.max(0, (Math.min(totalMins, 1320) - 1050) / 60);
-            nightOt = Math.max(0, (totalMins - 1320) / 60);
-        }
-    } else {
-        basicHrs = 8;
-        normalOt = Math.max(0, (Math.min(totalMins, 1320) - 1050) / 60);
-        nightOt = Math.max(0, (totalMins - 1320) / 60);
-    }
-    
-    entries.push({ date, type, worked:workedVal, normalOt, nightOt, basicHrs });
-    entries.sort((a,b)=>new Date(a.date)-new Date(b.date));
-    localStorage.setItem(STORE_KEY, JSON.stringify(entries));
-    renderHistory();
-    showToast("डाटा सेभ भयो! ✅");
-}
-
-function renderHistory(){
-    let body=document.getElementById("historyBody");
-    body.innerHTML="";
-    let displayEntries = showFullHistory ? entries : entries.slice(-5);
-    let wB=0, nOT=0, niOT=0, sD=0, suD=0, hD=0;
-    
-    entries.forEach(e => {
-        if(e.type==="weekday") { wB += e.basicHrs; nOT += e.normalOt; }
-        else if(e.type==="saturday" && e.worked==="yes") sD++;
-        else if(e.type==="sunday" && e.worked==="yes") suD++;
-        else if(e.type==="holiday" && e.worked==="yes") hD++;
-        niOT += e.nightOt;
-    });
-
-    displayEntries.forEach((e)=>{
-        let d = new Date(e.date);
-        let tr=document.createElement("tr");
-        if(e.type !== "weekday") tr.className = "holiday-row";
-        tr.innerHTML=`<td><span class="date-big">${e.date.split('-')[2]}</span><span class="month-small">${months[d.getMonth()]}</span></td>
-                      <td style="font-weight:bold">${daysArr[d.getDay()]}</td>
-                      <td>${e.basicHrs}</td>
-                      <td><b>${(e.normalOt+e.nightOt).toFixed(1)}</b></td>
-
-                      <td class="del-col"><button onclick="delEntry(${entries.indexOf(e)})">🗑️</button></td>`;
-        body.appendChild(tr);
-    });
-
-    document.getElementById("hWBasic").innerText = wB + " hrs";
-    document.getElementById("hSat").innerText = sD + " d";
-    document.getElementById("hSun").innerText = suD + " d";
-    document.getElementById("hHol").innerText = hD + " d";
-    document.getElementById("hNormalOT").innerText = nOT.toFixed(1);
-    document.getElementById("hNightOT").innerText = niOT.toFixed(1);
-}
-
-function calculateSalary() {
-    let rate = parseFloat(document.getElementById("hourlyRate").value) || 0;
-    let bP=0, suBP=0, hoBP=0, wOT=0, saOT=0, suOT=0, hoOT=0, nP=0;
-
-    entries.forEach(e => {
-        if(e.type==="weekday") {
-            bP += e.basicHrs * rate;
-            wOT += e.normalOt * rate * 1.5;
-        } else if(e.type === "sunday") {
-            suBP += e.basicHrs * rate;
-            if(e.worked === "yes") suOT += e.normalOt * rate * 1.5;
-        } else if(e.type === "holiday") {
-            hoBP += e.basicHrs * rate;
-            if(e.worked === "yes") hoOT += e.normalOt * rate * 1.5;
-        } else if(e.type === "saturday" && e.worked === "yes") {
-            saOT += e.normalOt * rate * 1.5;
-        }
-        nP += (e.nightOt * rate * 3.0); 
-    });
-
-    document.getElementById("mWBasic").innerText = "₩ " + bP.toLocaleString();
-    document.getElementById("mSunBasic").innerText = "₩ " + suBP.toLocaleString();
-    document.getElementById("mHolBasic").innerText = "₩ " + hoBP.toLocaleString();
-    document.getElementById("mWOT").innerText = "₩ " + wOT.toLocaleString();
-    document.getElementById("mSatOT").innerText = "₩ " + saOT.toLocaleString();
-    document.getElementById("mSunOT").innerText = "₩ " + suOT.toLocaleString();
-    document.getElementById("mHolOT").innerText = "₩ " + hoOT.toLocaleString();
-    document.getElementById("mNight").innerText = "₩ " + nP.toLocaleString();
-    
-    let total = bP + suBP + hoBP + wOT + saOT + suOT + hoOT + nP;
-    document.getElementById("finalSalary").innerText = Math.round(total).toLocaleString();
-    document.getElementById("hourView").classList.add("hide");
-    document.getElementById("moneyView").classList.remove("hide");
-}
-
-function switchToHours() {
-    document.getElementById("moneyView").classList.add("hide");
-    document.getElementById("hourView").classList.remove("hide");
-}
-function toggleHistory() { showFullHistory = !showFullHistory; renderHistory(); }
-function delEntry(i){ if(confirm("डिलिट गर्ने?")){ entries.splice(i,1); localStorage.setItem(STORE_KEY, JSON.stringify(entries)); renderHistory(); } }
-function resetAll(){ if(confirm("सबै सफा गर्ने?")){ entries=[]; localStorage.setItem(STORE_KEY,"[]"); renderHistory(); switchToHours(); } }
-
-function downloadAsPhoto() {
-    const area = document.getElementById('exportArea');
-    area.classList.add('exporting');
-    html2canvas(area, { scale: 2 }).then(canvas => {
-        let link = document.createElement('a');
-        link.download = `Ronnie_Payroll.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-        area.classList.remove('exporting');
-    });
-}
-
-/* --- Reminder Logic --- */
-const ALARM_KEY = "ronnie_alarm_time";
-function loadReminder() {
-    const savedTime = localStorage.getItem(ALARM_KEY);
-    if(savedTime) {
-        document.getElementById("reminderTime").value = savedTime;
-        document.getElementById("reminderStatus").innerText = "Alarm set for: " + savedTime;
-        document.getElementById("reminderStatus").style.color = "green";
-    }
-}
-
-function setReminder() {
-    let t = document.getElementById("reminderTime").value;
-    if(!t) return alert("Please select a time first.");
-    
-    if (!("Notification" in window)) {
-        alert("This browser does not support desktop notification");
-    } else if (Notification.permission !== "granted") {
-        Notification.requestPermission().then(permission => {
-            if(permission === "granted"){
-                saveAlarmToLocal(t);
+                onValue(ref(db, 'rooms/' + roomId), (snap) => {
+                    const val = snap.val();
+                    if(val) { gameData = val; this.updateUI(val); }
+                });
             }
-        });
-    } else {
-        saveAlarmToLocal(t);
-    }
-}
 
-function saveAlarmToLocal(t) {
-    localStorage.setItem(ALARM_KEY, t);
-    document.getElementById("reminderStatus").innerText = "Alarm set for: " + t;
-    document.getElementById("reminderStatus").style.color = "green";
-    showToast("Reminder Set! ⏰");
-    // Test notification immediately to confirm permission
-    new Notification("Ronnie Payroll", { body: "Notification Test Successful! ✅" });
-}
+            createCardTextures() {
+                ['S','H','D','C'].forEach(suit => {
+                    ['2','3','4','5','6','7','8','9','10','J','Q','K','A'].forEach(rank => {
+                        const key = `card_${suit}_${rank}`;
+                        if (this.textures.exists(key)) return;
+                        const canvas = this.textures.createCanvas(key, 80, 110);
+                        const ctx = canvas.getContext();
+                        ctx.fillStyle = 'white'; ctx.beginPath(); this.roundRect(ctx,0,0,80,110,8); ctx.fill();
+                        ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke();
+                        ctx.fillStyle = (suit==='H'||suit==='D')?'#d00':'#000';
+                        ctx.font = 'bold 16px Arial'; ctx.fillText(rank, 5, 20);
+                        ctx.font = '24px Arial'; ctx.fillText({S:'♠',H:'♥',D:'♦',C:'♣'}[suit], 30, 65);
+                        canvas.refresh();
+                    });
+                });
+                const back = this.textures.createCanvas('card_back', 80, 110);
+                const btx = back.getContext();
+                btx.fillStyle = '#2c3e50'; btx.beginPath(); this.roundRect(btx,0,0,80,110,8); btx.fill();
+                btx.strokeStyle = '#d4af37'; btx.lineWidth = 4; btx.stroke();
+                back.refresh();
+            }
 
-// Check time every 30 seconds
-setInterval(() => {
-    let savedTime = localStorage.getItem(ALARM_KEY);
-    if(savedTime) {
-        let now = new Date();
-        let current = now.toTimeString().substring(0, 5); // HH:MM
-        if(current === savedTime && now.getSeconds() < 30) { // Trigger only within the minute
-            new Notification("Ronnie Payroll", { 
-                body: "Time to fill your payroll! 📝",
-                icon: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-            });
+            roundRect(ctx, x, y, w, h, r) {
+                ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+            }
+
+            updateUI(data) {
+                if(this.roundText) {
+                    this.roundText.setText(`Round: ${data.currentRound || 1} / 5`);
+                }
+
+                this.children.list.filter(c => c.getData('isCard')).forEach(c => c.destroy());
+                if(mySeat === undefined) mySeat = data.players.findIndex(p => p.id === myId);
+
+                data.players.forEach((p, i) => {
+                    const rel = (i - mySeat + 4) % 4;
+                    const isTurn = data.turn === i && data.status === 'playing';
+                    this.playerTexts[rel].setText(`${p.name}\n${isTurn ? '⭐ ' : ''}Bid: ${p.bid} | Won: ${p.tricks}`);
+                    this.playerTexts[rel].setStyle({ color: isTurn ? '#d4af37' : '#fff' });
+                });
+
+                if(data.status === 'bidding' && data.turn === mySeat) {
+                    document.getElementById('bid-screen').classList.remove('hidden');
+                } else {
+                    document.getElementById('bid-screen').classList.add('hidden');
+                }
+
+                const hand = data.players[mySeat].hand || [];
+                hand.sort((a,b) => (a.s === b.s) ? rankVal[a.r] - rankVal[b.r] : a.s.localeCompare(b.s));
+                hand.forEach((card, i) => {
+                    const x = (this.scale.width/2 - (hand.length*20)/2) + (i*25);
+                    const cS = this.add.sprite(x, this.scale.height - 60, `card_${card.s}_${card.r}`).setInteractive().setData('isCard', true);
+                    const isValid = this.isMoveValid(card, hand, data.currentTrick || [], data.leadSuit);
+                    if(data.turn !== mySeat || !isValid) cS.setAlpha(0.5);
+                    cS.on('pointerdown', () => { if(data.turn === mySeat && isValid) this.playCard(card, i, data); });
+                });
+
+                (data.currentTrick || []).forEach(t => {
+                    const rel = (t.pIdx - mySeat + 4) % 4;
+                    const pos = [{x:this.scale.width/2, y:this.scale.height/2+50}, {x:this.scale.width/2-70, y:this.scale.height/2}, {x:this.scale.width/2, y:this.scale.height/2-50}, {x:this.scale.width/2+70, y:this.scale.height/2}][rel];
+                    this.add.sprite(pos.x, pos.y, `card_${t.card.s}_${t.card.r}`).setScale(0.8).setData('isCard', true);
+                });
+
+                if(data.status === 'round_end') showScoreboard(data);
+            }
+
+            isMoveValid(card, hand, trick, lead) {
+                if(!lead || trick.length === 0) return true;
+                const hasLead = hand.some(c => c.s === lead);
+                const hasSpade = hand.some(c => c.s === 'S');
+                
+                let winCard = trick[0].card;
+                trick.forEach(t => {
+                    const c = t.card;
+                    if((c.s==='S' && winCard.s!=='S') || (c.s==='S' && winCard.s==='S' && rankVal[c.r]>rankVal[winCard.r]) || (c.s===lead && winCard.s===lead && rankVal[c.r]>rankVal[winCard.r])) winCard = c;
+                });
+
+                if(hasLead) {
+                    if(card.s !== lead) return false;
+                    const betterLead = hand.filter(c => c.s === lead && rankVal[c.r] > rankVal[winCard.r]);
+                    if(winCard.s === lead && betterLead.length > 0) return rankVal[card.r] > rankVal[winCard.r];
+                    return true;
+                }
+                if(hasSpade) {
+                    if(card.s === 'S') {
+                        if(winCard.s === 'S') {
+                            const betterSpade = hand.filter(c => c.s === 'S' && rankVal[c.r] > rankVal[winCard.r]);
+                            if(betterSpade.length > 0) return rankVal[card.r] > rankVal[winCard.r];
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            playCard(card, idx, data) {
+                const p = [...data.players];
+                p[mySeat].hand.splice(idx, 1);
+                const newTrick = [...(data.currentTrick || []), {pIdx: mySeat, card: card}];
+                update(ref(db, 'rooms/'+roomId), { players: p, currentTrick: newTrick, leadSuit: data.leadSuit || card.s, turn: (mySeat+1)%4 });
+                
+                if(newTrick.length === 4) {
+                    setTimeout(() => this.resolveTrick(newTrick, p), 1000);
+                }
+            }
+
+            resolveTrick(trick, players) {
+                let winIdx = 0; let best = trick[0].card; const lead = trick[0].card.s;
+                trick.forEach((t, i) => {
+                    const c = t.card;
+                    if((c.s==='S' && best.s!=='S') || (c.s==='S' && best.s==='S' && rankVal[c.r]>rankVal[best.r]) || (c.s===lead && best.s===lead && rankVal[c.r]>rankVal[best.r])) { best = c; winIdx = i; }
+                });
+                
+                const winnerSeat = trick[winIdx].pIdx;
+                players[winnerSeat].tricks++;
+
+                const rel = (winnerSeat - mySeat + 4) % 4;
+                const dest = [{x:this.scale.width/2, y:this.scale.height}, {x:0, y:this.scale.height/2}, {x:this.scale.width/2, y:0}, {x:this.scale.width, y:this.scale.height/2}][rel];
+                
+                this.children.list.filter(c => c.getData('isCard') && !c.input).forEach(c => {
+                    this.tweens.add({ targets: c, x: dest.x, y: dest.y, alpha: 0, duration: 500 });
+                });
+
+                setTimeout(() => {
+                    if(players[0].hand.length === 0) {
+                        const roundNum = (gameData.currentRound || 1);
+                        players.forEach(pl => {
+                            const pts = (pl.tricks >= pl.bid) ? pl.bid + (pl.tricks-pl.bid)*0.1 : -pl.bid;
+                            if(!pl.roundScores) pl.roundScores = {};
+                            pl.roundScores[roundNum] = parseFloat(pts.toFixed(1));
+                            pl.totalScore = Object.values(pl.roundScores).reduce((a,b) => a+b, 0);
+                        });
+                        update(ref(db, 'rooms/'+roomId), { players, status: 'round_end', currentTrick: [], currentRound: roundNum });
+                    } else {
+                        update(ref(db, 'rooms/'+roomId), { players, currentTrick: [], turn: winnerSeat, leadSuit: '' });
+                    }
+                }, 600);
+            }
         }
-    }
-}, 30000);
 
-document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
-autoDetectDay(); renderHistory(); loadReminder();
-</script>
+        window.startGame = async () => {
+            const name = document.getElementById('p-name').value;
+            roomId = document.getElementById('r-id').value;
+            if(!name || !roomId) return;
+            myId = name + Date.now();
+            document.getElementById('login-screen').classList.add('hidden');
+            
+            const rRef = ref(db, 'rooms/' + roomId);
+            const snap = await get(rRef);
+            let p = snap.exists() ? snap.val().players : [];
+            if(p.length < 4) {
+                p.push({id: myId, name, bid:0, tricks:0, hand:[], totalScore:0, roundScores: {}});
+                update(rRef, {players: p, status: p.length===4 ? 'waiting' : 'waiting'});
+            }
+            
+            game = new Phaser.Game({ type: Phaser.AUTO, width: window.innerWidth, height: window.innerHeight, parent: 'game-container', scene: MainScene });
+            
+            onValue(rRef, (s) => {
+                const d = s.val();
+                if(d && d.status==='waiting' && d.players.length===4 && d.players[0].id===myId) {
+                    dealCards(d.players, 1);
+                }
+            });
+        };
+
+        window.dealCards = (players, round) => {
+            let deck = []; ['S','H','D','C'].forEach(s => ['2','3','4','5','6','7','8','9','10','J','Q','K','A'].forEach(r => deck.push({s,r})));
+            deck.sort(() => Math.random() - 0.5);
+            players.forEach((p, i) => { p.hand = deck.slice(i*13, (i+1)*13); p.bid = 0; p.tricks = 0; });
+            update(ref(db, 'rooms/'+roomId), { players, status: 'bidding', turn: 0, currentRound: round, currentTrick: [], leadSuit: '' });
+        };
+
+        const bDiv = document.getElementById('bid-options');
+        for(let i=1; i<=8; i++) {
+            const btn = document.createElement('button'); btn.innerText = i;
+            btn.onclick = () => {
+                const p = [...gameData.players]; p[mySeat].bid = i;
+                const nextTurn = (gameData.turn + 1);
+                if(nextTurn === 4) {
+                    const total = p.reduce((s, pl) => s + pl.bid, 0);
+                    // --- CHANGED LOGIC HERE ---
+                    if(total < 10) {
+                        // 1. Give Points (Bid + 0.1)
+                        p.forEach(pl => {
+                            if(!pl.roundScores) pl.roundScores = {};
+                            pl.roundScores[gameData.currentRound] = pl.bid + 0.1;
+                            pl.totalScore = Object.values(pl.roundScores).reduce((a,b) => a+b, 0);
+                        });
+
+                        // 2. Check if Game Over (Round 5)
+                        if (gameData.currentRound >= 5) {
+                            update(ref(db, 'rooms/'+roomId), { players: p, status: 'round_end', currentTrick: [], currentRound: gameData.currentRound });
+                        } else {
+                            // 3. Move to NEXT Round
+                            dealCards(p, gameData.currentRound + 1);
+                        }
+                        showToast("Total < 10: Bonus Points! Next Round.");
+                    } else {
+                        update(ref(db, 'rooms/'+roomId), { players: p, status: 'playing', turn: 0 });
+                    }
+                    // --------------------------
+                } else {
+                    update(ref(db, 'rooms/'+roomId), { players: p, turn: nextTurn });
+                }
+            };
+            bDiv.appendChild(btn);
+        }
+
+        window.showScoreboard = (data) => {
+            const screen = document.getElementById('score-screen');
+            screen.classList.remove('hidden');
+            
+            const sorted = [...data.players].sort((a,b) => b.totalScore - a.totalScore);
+            
+            let html = `<table><tr><th>Rank</th><th>Player</th>`;
+            for(let r=1; r<= (data.currentRound || 1); r++) html += `<th>R${r}</th>`;
+            html += `<th>Total</th></tr>`;
+            
+            sorted.forEach((p, idx) => {
+                html += `<tr class="${idx===0?'rank-1':''}"><td>${idx+1}</td><td>${p.name}</td>`;
+                for(let r=1; r<=(data.currentRound || 1); r++) html += `<td>${p.roundScores ? p.roundScores[r] || '-' : '-'}</td>`;
+                html += `<td><b>${p.totalScore.toFixed(1)}</b></td></tr>`;
+            });
+            document.getElementById('score-content').innerHTML = html + `</table>`;
+            
+            const isHost = data.players[0].id === myId;
+            if(data.currentRound >= 5 && (data.status === 'round_end' || data.players[0].hand.length === 0)) {
+                document.getElementById('game-over-controls').classList.remove('hidden');
+                document.getElementById('host-next-btn').classList.add('hidden');
+            } else if(isHost) {
+                document.getElementById('host-next-btn').classList.remove('hidden');
+            }
+        };
+
+        window.toggleScoreboard = () => {
+            if(gameData) showScoreboard(gameData);
+            document.getElementById('score-screen').classList.toggle('hidden');
+        };
+
+        window.nextRound = () => {
+            dealCards(gameData.players, gameData.currentRound + 1);
+            document.getElementById('score-screen').classList.add('hidden');
+        };
+
+        window.resetWholeGame = () => {
+            const p = gameData.players.map(pl => ({...pl, totalScore: 0, roundScores: {}, tricks: 0, bid: 0}));
+            dealCards(p, 1);
+            document.getElementById('game-over-controls').classList.add('hidden');
+            document.getElementById('score-screen').classList.add('hidden');
+        };
+
+        function showToast(m) { const n = document.getElementById('notification'); n.innerText = m; n.style.display='block'; setTimeout(()=>n.style.display='none',3000); }
+    </script>
 </body>
 </html>
